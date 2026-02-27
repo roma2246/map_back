@@ -140,6 +140,7 @@ router.post('/login', loginValidation, async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isAdmin: user.is_admin || false,
         createdAt: user.created_at
       }
     });
@@ -172,6 +173,7 @@ router.get('/me', auth, async (req, res) => {
         id: user.id,
         name: user.name,
         email: user.email,
+        isAdmin: user.is_admin || false,
         createdAt: user.created_at
       }
     });

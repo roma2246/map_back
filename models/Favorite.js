@@ -31,7 +31,7 @@ class Favorite {
     return parseInt(result.rows[0].count) > 0;
   }
 
-  // Удаление избранного места
+  // Удаление избранного места (для самого пользователя)
   static async delete(userId, placeId) {
     const result = await pool.query(
       'DELETE FROM favorites WHERE user_id = $1 AND place_id = $2 RETURNING *',
@@ -48,8 +48,28 @@ class Favorite {
     );
     return result.rows[0];
   }
+
+  // [ADMIN] Удаление избранного по его ID (без привязки к пользователю)
+  static async deleteById(favoriteId) {
+    const result = await pool.query(
+      'DELETE FROM favorites WHERE id = $1 RETURNING *',
+      [favoriteId]
+    );
+    return result.rows[0] || null;
+  }
+
+  // [ADMIN] Получить все избранные места конкретного пользователя
+  static async findAllByUserId(userId) {
+    const result = await pool.query(
+      `SELECT f.*, u.name AS user_name, u.email AS user_email
+       FROM favorites f
+       JOIN users u ON f.user_id = u.id
+       WHERE f.user_id = $1
+       ORDER BY f.created_at DESC`,
+      [userId]
+    );
+    return result.rows;
+  }
 }
 
 module.exports = Favorite;
-
-
